@@ -10,6 +10,20 @@ st.set_page_config(
     layout="wide"
 )
 
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import CountVectorizer
+import streamlit as st
+
+@st.cache_data
+def compute_similarity(movies):
+    cv = CountVectorizer(max_features=5000, stop_words='english')
+    vectors = cv.fit_transform(movies['tags']).toarray()
+    similarity = cosine_similarity(vectors)
+    return similarity
+
+
+
+
 
 
 # -------------------------------
@@ -77,7 +91,8 @@ def recommend(movie):
 movies_dict = pickle.load(open('movie_dict.pkl', 'rb'))
 movies = pd.DataFrame(movies_dict)
 
-similarity = pickle.load(open('similarity.pkl', 'rb'))
+similarity = compute_similarity(movies)
+
 
 
 # -------------------------------
@@ -117,3 +132,4 @@ if st.button("Recommend"):
                 st.image(posters[i])
             else:
                 st.write("Poster not available")
+
